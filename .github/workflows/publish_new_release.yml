@@ -1,40 +1,46 @@
-# This workflows will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-# Copied from https://github.com/randyzwitch/streamlit-folium/blob/master/.github/workflows/publish_PYPI_each_tag.yml and https://github.com/whitphx/streamlit-webrtc/blob/main/.github/workflows/publish.yml
-name: Upload Python Package
+name: Update frontend build assets
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-commit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
-          python-version: "3.8"
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+          persist-credentials: false
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-      - name: Install Python dependencies
+          node-version: 18
+
+      - name: Install and build frontend
         run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
-      - name: Build streamlit-drawable-canvas JS
-        run: |
+          cd streamlit_drawable_canvas/frontend
           npm ci
           npm run build
-        working-directory: streamlit_drawable_canvas/frontend
-      - name: Build and publish
+
+      - name: Commit updated build directory
         env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT2 }}
         run: |
-          pwd
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+          if git status --short | grep "streamlit_drawable_canvas/frontend/build"; then
+            git add streamlit_drawable_canvas/frontend/build
+            git commit -m "CI: update frontend build"
+            git push
+          else
+            echo "No changes in build directory; skipping commit"
+          fi
