@@ -27,11 +27,17 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install and build frontend
-        run: |
-          cd streamlit_drawable_canvas/frontend
-          npm ci
-          npm run build
+      - name: Install deps
+        working-directory: streamlit_drawable_canvas/frontend
+        run: npm ci
+
+      - name: Audit (non-blocking)
+        working-directory: streamlit_drawable_canvas/frontend
+        run: npm audit --production || true
+
+      - name: Build frontend
+        working-directory: streamlit_drawable_canvas/frontend
+        run: npm run build
         env:
           NODE_OPTIONS: --openssl-legacy-provider
 
