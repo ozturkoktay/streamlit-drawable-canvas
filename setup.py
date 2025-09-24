@@ -25,10 +25,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     classifiers=[],
-    python_requires=">=3.6",
+    python_requires=">=3.12",
     install_requires=[
         "Pillow",
         "numpy",
-        "streamlit >= 0.63",
-    ]
+        "streamlit",
+    ],
 )
