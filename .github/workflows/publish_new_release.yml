@@ -32,6 +32,8 @@ jobs:
           cd streamlit_drawable_canvas/frontend
           npm ci
           npm run build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
 
       - name: Commit updated build directory
         env:
