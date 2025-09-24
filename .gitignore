@@ -12,6 +12,7 @@ eggs/
 .eggs/
 *.egg-info/
 *.egg
+package-lock.json
 
 # Unit test / coverage reports
 .coverage
