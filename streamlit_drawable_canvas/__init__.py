@@ -123,12 +123,12 @@ def st_canvas(
         background_image = _resize_img(background_image, height, width)
         # Reduce network traffic and cache when switch another configure, use streamlit in-mem filemanager to convert image to URL
         background_image_url = image_to_url(
-            background_image,
-            width,
-            True,
-            "RGB",
-            "PNG",
-            f"drawable-canvas-bg-{md5(background_image.tobytes()).hexdigest()}-{key}",
+            image=background_image,
+            layout_config=width,
+            clamp=True,
+            channels="RGB",
+            output_format="JPEG",
+            image_id=f"drawable-canvas-bg-{md5(background_image.tobytes()).hexdigest()}-{key}",
         )
         background_image_url = (
             st._config.get_option("server.baseUrlPath") + background_image_url
